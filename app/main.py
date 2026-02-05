@@ -1,0 +1,19 @@
+"""
+API module for titanic survivor prediction
+"""
+
+from fastapi import FastAPI
+from .router import predictions
+
+app = FastAPI()
+
+app.title = "Titanic Survivor Predictor"
+app.include_router(predictions.router)
+
+
+@app.get("/")
+def start():
+    """
+    The default endpoint
+    """
+    return {"Message": "Titanic up up and away"}
