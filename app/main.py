@@ -16,4 +16,4 @@ def start():
     """
     The default endpoint
     """
-    return {"Message": "Titanic up up and away"}
+    return {"message": "Titanic Survivor Predictor is active"}
