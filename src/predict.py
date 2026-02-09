@@ -4,8 +4,9 @@ Prediction module for titanic survivors
 
 import joblib
 import pandas as pd
+from src.config.settings import MODEL_PATH
 
-pipeline = joblib.load("models/titanic_pipeline.pkl")
+pipeline = joblib.load(MODEL_PATH)
 
 
 def predict(data):

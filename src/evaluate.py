@@ -2,15 +2,14 @@
 Module for evaluating the accuracy and metrics of the trained model
 """
 
-from pathlib import Path
 import joblib
 from sklearn.metrics import classification_report
 from src.load import load_and_split_data
+from src.config.settings import DATASET_PATH, MODEL_PATH
 
-pipeline = joblib.load("models/titanic_pipeline.pkl")
+pipeline = joblib.load(MODEL_PATH)
 
-BASE_DIR = Path("data/raw") / "titanic.csv"
-X_train, X_test, y_train, y_test = load_and_split_data(BASE_DIR)
+X_train, X_test, y_train, y_test = load_and_split_data(DATASET_PATH)
 
 predictions = pipeline.predict(X_test)
 

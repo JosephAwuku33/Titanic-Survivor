@@ -6,7 +6,6 @@ different feature groups, combines them into a single preprocessing pipeline,
 and trains a LogisticRegression model on the processed data.
 """
 
-from pathlib import Path
 import joblib
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
@@ -15,11 +14,10 @@ from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from src.load import load_and_split_data
 from src.utils.transformer import FamilyFeatures
+from src.config.settings import DATASET_PATH, MODEL_PATH
 
 # Load training and testing data
-BASE_DIR = Path("data/raw") / "titanic.csv"
-
-X_train, X_test, y_train, y_test = load_and_split_data(BASE_DIR)
+X_train, X_test, y_train, y_test = load_and_split_data(DATASET_PATH)
 
 # Feature groups
 age_feature = ["Age"]
@@ -89,6 +87,6 @@ print("Model Coefficients:")
 print(f"{pipeline.named_steps['model'].coef_}\n")
 
 # Create models directory and save the pipeline
-Path("models").mkdir(exist_ok=True, parents=True)
-joblib.dump(pipeline, "models/titanic_pipeline.pkl")
+MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+joblib.dump(pipeline, MODEL_PATH)
 print("Successfully trained and saved the pipeline to 'models/titanic_pipeline.pkl'")
