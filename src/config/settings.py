@@ -25,7 +25,7 @@ if not MODEL_PATH_FROM_ENV:
 
 
 if PY_ENV == "production":
-    DATASET_PATH = Path(str(HF_DATASET_PATH_FROM_ENV))
+    DATASET_PATH = str(HF_DATASET_PATH_FROM_ENV)
 else:
     DATASET_PATH = Path(str(LOCAL_DATASET_PATH_FROM_ENV))
 
