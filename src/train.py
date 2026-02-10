@@ -96,3 +96,7 @@ def train() -> dict:
     except Exception as e:  # pylint: disable=broad-except
         # Capture any error (Data issues, File permissions, Math errors)
         return {"success": False, "pipeline": None, "error": str(e)}
+
+
+if __name__ == "__main__":
+    train()
