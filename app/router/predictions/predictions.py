@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.post("/predict")
-async def make_prediction(data: SurvivorInput):
+def make_prediction(data: SurvivorInput):
     """
     Endpoint to get the if a person survived the titanic
     """

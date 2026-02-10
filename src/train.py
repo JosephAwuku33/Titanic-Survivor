@@ -19,74 +19,82 @@ from src.config.settings import DATASET_PATH, MODEL_PATH
 # Load training and testing data
 X_train, X_test, y_train, y_test = load_and_split_data(DATASET_PATH)
 
-# Feature groups
-age_feature = ["Age"]
-numerical_features = ["Fare"]
-categorical_features = ["Embarked", "Sex"]
-passenger_class_feature = ["Pclass"]
-family_features = ["SibSp", "Parch"]
 
-# Pipelines for each feature group
-age_pipeline = Pipeline(
-    steps=[
-        ("imputer", SimpleImputer(strategy="median")),
-        ("scaler", StandardScaler()),
-    ]
-)
+def train() -> dict:
+    """
+    Trains the Titanic model and returns a status dictionary.
 
-num_pipeline = Pipeline(
-    steps=[
-        ("scaler", StandardScaler()),
-    ]
-)
+    Returns:
+        dict: {
+            "success": bool,
+            "pipeline": Pipeline object or None,
+            "error": str or None
+        }
+    """
+    try:
+        # 1. Feature groups
+        age_feature = ["Age"]
+        numerical_features = ["Fare"]
+        categorical_features = ["Embarked", "Sex"]
+        passenger_class_feature = ["Pclass"]
+        family_features = ["SibSp", "Parch"]
 
-pclass_pipeline = Pipeline(
-    steps=[
-        ("scaler", StandardScaler()),
-    ]
-)
+        # 2. Pipelines (same as yours)
+        age_pipeline = Pipeline(
+            steps=[
+                ("imputer", SimpleImputer(strategy="median")),
+                ("scaler", StandardScaler()),
+            ]
+        )
+        num_pipeline = Pipeline(steps=[("scaler", StandardScaler())])
+        pclass_pipeline = Pipeline(steps=[("scaler", StandardScaler())])
 
-cat_pipeline = Pipeline(
-    steps=[
-        ("encoder", OneHotEncoder(drop="first", handle_unknown="ignore")),
-    ]
-)
+        # Note: drop="first" is used here for Logistic Regression
+        cat_pipeline = Pipeline(
+            steps=[
+                ("encoder", OneHotEncoder(drop="first", handle_unknown="ignore")),
+            ]
+        )
 
-family_pipeline = Pipeline(
-    steps=[
-        ("family_features", FamilyFeatures()),
-    ]
-)
+        family_pipeline = Pipeline(
+            steps=[
+                ("family_features", FamilyFeatures()),
+            ]
+        )
 
-# Combine all feature pipelines using ColumnTransformer
-preprocessor = ColumnTransformer(
-    transformers=[
-        ("age", age_pipeline, age_feature),
-        ("num", num_pipeline, numerical_features),
-        ("pclass", pclass_pipeline, passenger_class_feature),
-        ("cat", cat_pipeline, categorical_features),
-        ("family", family_pipeline, family_features),
-    ],
-    remainder="drop",  # Drop any columns not specified in transformers
-)
+        # 3. Combine using ColumnTransformer
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ("age", age_pipeline, age_feature),
+                ("num", num_pipeline, numerical_features),
+                ("pclass", pclass_pipeline, passenger_class_feature),
+                ("cat", cat_pipeline, categorical_features),
+                ("family", family_pipeline, family_features),
+            ],
+            remainder="drop",
+        )
 
-# Create full pipeline with preprocessing and model
-pipeline = Pipeline(
-    steps=[
-        ("preprocessing", preprocessor),
-        ("model", LogisticRegression(max_iter=1000, random_state=42)),
-    ]
-)
+        # 4. Full Pipeline
+        pipeline = Pipeline(
+            steps=[
+                ("preprocessing", preprocessor),
+                ("model", LogisticRegression(max_iter=1000, random_state=42)),
+            ]
+        )
 
-# Fit the pipeline
-pipeline.fit(X_train, y_train)
-print(f"Pipeline:\n{pipeline}\n")
+        # 5. Fit the model
+        # Logic check: Ensure X_train and y_train are not empty
+        if X_train is None or y_train is None:
+            raise ValueError("Training data is empty or not loaded correctly.")
 
-# Display model coefficients
-print("Model Coefficients:")
-print(f"{pipeline.named_steps['model'].coef_}\n")
+        pipeline.fit(X_train, y_train)
 
-# Create models directory and save the pipeline
-MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-joblib.dump(pipeline, MODEL_PATH)
-print("Successfully trained and saved the pipeline to 'models/titanic_pipeline.pkl'")
+        # 6. Save the model
+        MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(pipeline, MODEL_PATH)
+
+        return {"success": True, "pipeline": pipeline, "error": None}
+
+    except Exception as e:  # pylint: disable=broad-except
+        # Capture any error (Data issues, File permissions, Math errors)
+        return {"success": False, "pipeline": None, "error": str(e)}
