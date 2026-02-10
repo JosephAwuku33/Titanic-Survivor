@@ -39,7 +39,7 @@ def train() -> dict:
         passenger_class_feature = ["Pclass"]
         family_features = ["SibSp", "Parch"]
 
-        # 2. Pipelines (same as yours)
+        # 2. Pipelines
         age_pipeline = Pipeline(
             steps=[
                 ("imputer", SimpleImputer(strategy="median")),
@@ -49,7 +49,6 @@ def train() -> dict:
         num_pipeline = Pipeline(steps=[("scaler", StandardScaler())])
         pclass_pipeline = Pipeline(steps=[("scaler", StandardScaler())])
 
-        # Note: drop="first" is used here for Logistic Regression
         cat_pipeline = Pipeline(
             steps=[
                 ("encoder", OneHotEncoder(drop="first", handle_unknown="ignore")),
@@ -83,7 +82,6 @@ def train() -> dict:
         )
 
         # 5. Fit the model
-        # Logic check: Ensure X_train and y_train are not empty
         if X_train is None or y_train is None:
             raise ValueError("Training data is empty or not loaded correctly.")
 
